@@ -4,27 +4,24 @@
  */
 public class BannerController
 {
-	private static int x = 50, dx = 5;
-	
-	private static UpdaterThread updater;
+	private int x = 50, dx = 5;
 
-	public static void start()
+	private UpdaterThread updater;
+
+	public BannerController()
 	{
-		if ( updater == null )
-		{
-			updater = new UpdaterThread();
-			updater.start();
-		}
+		updater = new UpdaterThread();
+		updater.start();
 	}
 
-	public static void tick()
+	public void tick()
 	{
 		x += dx;
 		if ( x > 1440 )
 			x = -1000;
 	}
-	
-	public static int getBannerX()
+
+	public int getBannerX()
 	{
 		return x;
 	}
@@ -32,14 +29,14 @@ public class BannerController
 	/**
 	 * The thread that constantly moves the banner.
 	 */
-	private static class UpdaterThread extends Thread
+	private class UpdaterThread extends Thread
 	{
 		@Override
 		public void run()
 		{
 			while ( true )
 			{
-				BannerController.tick();
+				tick();
 				try
 				{
 					Thread.sleep( 5 );

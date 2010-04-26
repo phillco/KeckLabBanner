@@ -71,7 +71,8 @@ public class MainForm extends JFrame implements ActionListener
 		if ( e.getSource() == hostButton )
 		{
 			setVisible( false );
-			new BannerForm();
+			BannerController controller = new BannerController();
+			new BannerForm( controller );
 			dispose();
 		}
 		

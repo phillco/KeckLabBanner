@@ -24,10 +24,12 @@ public class BannerForm extends JFrame implements KeyListener
 	 * The <code>Image</code> used for double buffering.
 	 */
 	private Image virtualMem;
+	
+	private BannerController controller;
 
-	public BannerForm()
+	public BannerForm( BannerController controller )
 	{
-		BannerController.start();
+		this.controller = controller;
 		addKeyListener( this );
 		setSize( 600, 600 );
 		setDefaultCloseOperation( DISPOSE_ON_CLOSE );
@@ -59,7 +61,7 @@ public class BannerForm extends JFrame implements KeyListener
 		g.fillRect( 0, 0, getWidth(), getHeight() );
 		g.setFont( new Font( "Sans serif", Font.BOLD, 256 ) );
 		g.setColor( Color.red );
-		g.drawString( "Testing", BannerController.getBannerX(), 600 );
+		g.drawString( "Testing", controller.getBannerX(), 600 );
 	}
 
 	@Override
