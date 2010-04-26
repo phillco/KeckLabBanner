@@ -69,7 +69,7 @@ public class BannerForm extends JFrame implements KeyListener
 		// Draw the server/clent's status.
 		g.setFont( new Font( "Sans serif", 0, 12 ) );
 		g.setColor( Color.gray );
-		g.drawString( dongle.getStatusString(), 5, getHeight() - 15 );		
+		g.drawString( dongle.getStatusString() + " | " + controller.getStatusString(), 5, getHeight() - 15 );		
 	}
 
 	@Override

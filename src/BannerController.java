@@ -23,6 +23,10 @@ public class BannerController
 		shouldRun = false;
 	}
 	
+	public String getStatusString()
+	{
+		return "x: " + x + " [ " + myOffset + "/" + totalWidth + "]";
+	}
 
 	/**
 	 * Updates the size of the global banner (call when a client is added or removed).
@@ -54,6 +58,11 @@ public class BannerController
 		// If the banner is off the last computer's screen, wrap it...
 		if ( x > totalWidth )
 			x = -1000;
+	}
+	
+	public int getX()
+	{
+		return x;
 	}
 
 	/**

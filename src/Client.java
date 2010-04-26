@@ -1,4 +1,7 @@
+import java.awt.GraphicsDevice;
+import java.awt.GraphicsEnvironment;
 import java.io.DataInputStream;
+import java.io.DataOutputStream;
 import java.io.IOException;
 import java.net.Socket;
 import java.net.UnknownHostException;
@@ -8,6 +11,8 @@ import javax.swing.JOptionPane;
 public class Client extends NetworkDongle
 {
 	private DataInputStream inputStream;
+
+	private DataOutputStream outputStream;
 
 	private Socket localSocket;
 
@@ -28,8 +33,8 @@ public class Client extends NetworkDongle
 		try
 		{
 			localSocket = new Socket( serverAddress, serverPort );
-			// out = new PrintWriter( localSocket.getOutputStream(), true );
 			inputStream = new DataInputStream( localSocket.getInputStream() );
+			outputStream = new DataOutputStream( localSocket.getOutputStream() );
 		}
 		catch ( UnknownHostException e )
 		{
@@ -44,6 +49,16 @@ public class Client extends NetworkDongle
 
 		listenThread.start();
 		connected = true;
+		
+		try
+		{
+			outputStream.writeInt( MainForm.screenWidth );
+		}
+		catch ( IOException e )
+		{
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
 		System.out.println( "Client connected to " + serverAddress + ":" + serverPort + "!" );
 		this.localController = localController;
 		this.localController.start();

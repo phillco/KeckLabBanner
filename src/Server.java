@@ -1,3 +1,4 @@
+import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.IOException;
 import java.net.InetAddress;
@@ -84,29 +85,32 @@ public class Server extends NetworkDongle
 		int globalWidth = clients.size() * BannerController.SCREEN_WIDTH;
 		int currentLocation = 0;
 
+		
 		// Update all the clients of the location of the banner / size of global area.
 		for ( Computer cm : clients )
 		{
 			if ( cm instanceof ServerComputer )
+			{
 				localController.updateOffsetData( globalWidth, currentLocation );
+				currentLocation += MainForm.screenWidth;
+			}
 			else
 			{
 				try
 				{
 					ClientComputer client = (ClientComputer) cm;
 					client.outputStream.writeByte( 32 );
-					client.outputStream.writeInt( localController.getLocalBannerX() );
+					client.outputStream.writeInt( localController.getX() );
 					client.outputStream.writeInt( globalWidth );
 					client.outputStream.writeInt( currentLocation );
 					client.outputStream.flush();
+					currentLocation += client.screenWidth;
 				}
 				catch ( IOException e )
 				{
 				}
 			}
-			currentLocation += BannerController.SCREEN_WIDTH;
 		}
-		System.out.println( "Server: " + clients.size() + " clients reflowed" );
 	}
 
 	private abstract class Computer
@@ -119,10 +123,16 @@ public class Server extends NetworkDongle
 
 		public DataOutputStream outputStream;
 
+		public DataInputStream inputStream;
+
+		public int screenWidth;
+
 		public ClientComputer( Socket socket ) throws IOException
 		{
 			this.socket = socket;
 			outputStream = new DataOutputStream( socket.getOutputStream() );
+			inputStream = new DataInputStream( socket.getInputStream() );
+			screenWidth = inputStream.readInt();
 		}
 	}
 
@@ -204,7 +214,7 @@ public class Server extends NetworkDongle
 	public String getStatusString()
 	{
 		if ( connected )
-			return "Server at " + getServerIP() + ". " + ( clients.size() > 0 ? clients.size() + " client(s)" : "" );
+			return "Server at " + getServerIP() + ". " + ( clients.size() > 1 ? clients.size() - 1 + " client(s)" : "" );
 		else
 			return "Disconnected server";
 	}

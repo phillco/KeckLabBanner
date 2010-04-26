@@ -1,6 +1,8 @@
 import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.Font;
+import java.awt.GraphicsDevice;
+import java.awt.GraphicsEnvironment;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 
@@ -18,6 +20,7 @@ import javax.swing.JPanel;
  */
 public class MainForm extends JFrame implements ActionListener
 {
+	public static int screenWidth;
 
 	private JButton hostButton, joinButton;
 
@@ -73,7 +76,7 @@ public class MainForm extends JFrame implements ActionListener
 		{
 			setVisible( false );
 			BannerController controller = new BannerController();
-			int port = Integer.parseInt( JOptionPane.showInputDialog( "Enter the port number" ) );
+			int port = 50900;// Integer.parseInt( JOptionPane.showInputDialog( "Enter the port number" ) );
 			new BannerForm( controller, new Server( controller, port ) );
 			dispose();
 		}
@@ -81,7 +84,7 @@ public class MainForm extends JFrame implements ActionListener
 		{
 			setVisible( false );
 			BannerController controller = new BannerController();
-			String input = JOptionPane.showInputDialog( "Enter the server's address and port." );
+			String input = "10.40.123.89:50900";//JOptionPane.showInputDialog( "Enter the server's address and port." );
 			new BannerForm( controller, new Client( controller, input.split( ":" )[0], Integer.parseInt( input.split( ":" )[1] ) ) );
 			dispose();
 		}
@@ -94,6 +97,8 @@ public class MainForm extends JFrame implements ActionListener
 	 */
 	public static void main( String[] args )
 	{
+		GraphicsDevice graphicsDevice = GraphicsEnvironment.getLocalGraphicsEnvironment().getDefaultScreenDevice();
+		screenWidth = graphicsDevice.getDisplayMode().getWidth();
 		new MainForm().setVisible( true );
 	}
 }
