@@ -61,7 +61,7 @@ public class BannerForm extends JFrame implements KeyListener
 		g.fillRect( 0, 0, getWidth(), getHeight() );
 		g.setFont( new Font( "Sans serif", Font.BOLD, 256 ) );
 		g.setColor( Color.red );
-		g.drawString( "Testing", controller.getBannerX(), 600 );
+		g.drawString( "Testing", controller.getLocalBannerX(), 600 );
 	}
 
 	@Override
