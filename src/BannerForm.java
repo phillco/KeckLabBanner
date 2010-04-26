@@ -27,6 +27,7 @@ public class BannerForm extends JFrame implements KeyListener
 
 	public BannerForm()
 	{
+		BannerController.start();
 		addKeyListener( this );
 		setSize( 600, 600 );
 		setDefaultCloseOperation( DISPOSE_ON_CLOSE );
@@ -59,7 +60,6 @@ public class BannerForm extends JFrame implements KeyListener
 		g.setFont( new Font( "Sans serif", Font.BOLD, 256 ) );
 		g.setColor( Color.red );
 		g.drawString( "Testing", BannerController.getBannerX(), 600 );
-		BannerController.tick();
 	}
 
 	@Override
