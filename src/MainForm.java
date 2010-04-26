@@ -55,4 +55,14 @@ public class MainForm extends JFrame
 		setResizable( false );
 		setVisible( true );
 	}
+
+	/**
+	 * Program entry point.
+	 * @param args Command-line args.
+	 */
+	public static void main( String[] args )
+	{
+		new MainForm().setVisible( true );
+	}
+
 }
