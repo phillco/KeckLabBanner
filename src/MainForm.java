@@ -1,6 +1,8 @@
 import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.Font;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 
 import javax.swing.Box;
 import javax.swing.BoxLayout;
@@ -13,10 +15,11 @@ import javax.swing.JPanel;
  * The startup form with buttons to host/connect.
  * @author Phillip Cohen
  */
-public class MainForm extends JFrame
+public class MainForm extends JFrame implements ActionListener
 {
-	private static final long serialVersionUID = 2062760208030859011L;
 
+	private JButton hostButton, joinButton;
+	
 	public MainForm()
 	{
 		setLayout( new BoxLayout( getContentPane(), BoxLayout.Y_AXIS ) );
@@ -34,10 +37,15 @@ public class MainForm extends JFrame
 		add( titlePanel );
 
 		// Add the host/connect buttons.
+		hostButton = new JButton( "Start a new session" );
+		joinButton = new JButton( "Join existing session" );
+		
+		hostButton.addActionListener( this );
+		joinButton.addActionListener( this );
 		add( Box.createRigidArea( new Dimension( 1, 25 ) ) );
-		add( new JButton( "Start a new session" ) );
+		add( hostButton );
 		add( Box.createRigidArea( new Dimension( 1, 5 ) ) );
-		add( new JButton( "Join existing session" ) );
+		add( joinButton );
 		add( Box.createRigidArea( new Dimension( 1, 35 ) ) );
 
 		// Add the footer.
@@ -51,9 +59,22 @@ public class MainForm extends JFrame
 
 		// Other attributes...
 		setTitle( "Keck Lab Banner!" );
+		setDefaultCloseOperation( DISPOSE_ON_CLOSE );
 		setSize( 400, 230 );
 		setResizable( false );
 		setVisible( true );
+	}
+
+	@Override
+	public void actionPerformed( ActionEvent e )
+	{
+		if ( e.getSource() == hostButton )
+		{
+			setVisible( false );
+			new BannerForm();
+			dispose();
+		}
+		
 	}
 
 	/**
@@ -64,5 +85,4 @@ public class MainForm extends JFrame
 	{
 		new MainForm().setVisible( true );
 	}
-
 }
