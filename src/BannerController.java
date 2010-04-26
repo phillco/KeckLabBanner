@@ -12,14 +12,8 @@ public class BannerController
 	public final static int SCREEN_WIDTH = 1440;
 	private int x, totalWidth, myOffset;
 
-	public BannerController()
+	public void start( )
 	{
-		this( 0, SCREEN_WIDTH, 0 );
-	}
-
-	public BannerController( int x, int totalWidth, int localOffset )
-	{
-		updateOffsetData( x, totalWidth, localOffset );
 		updater.start();
 	}
 
@@ -29,6 +23,15 @@ public class BannerController
 	public void updateOffsetData( int x, int totalWidth, int localOffset )
 	{
 		this.x = x;
+		this.totalWidth = totalWidth;
+		this.myOffset = localOffset;
+	}
+	
+	/**
+	 * Updates the size of the global banner (call when a client is added or removed). 
+	 */
+	public void updateOffsetData( int totalWidth, int localOffset )
+	{
 		this.totalWidth = totalWidth;
 		this.myOffset = localOffset;
 	}
