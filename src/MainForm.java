@@ -9,6 +9,7 @@ import javax.swing.BoxLayout;
 import javax.swing.JButton;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
+import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 
 /**
@@ -19,7 +20,7 @@ public class MainForm extends JFrame implements ActionListener
 {
 
 	private JButton hostButton, joinButton;
-	
+
 	public MainForm()
 	{
 		setLayout( new BoxLayout( getContentPane(), BoxLayout.Y_AXIS ) );
@@ -39,7 +40,7 @@ public class MainForm extends JFrame implements ActionListener
 		// Add the host/connect buttons.
 		hostButton = new JButton( "Start a new session" );
 		joinButton = new JButton( "Join existing session" );
-		
+
 		hostButton.addActionListener( this );
 		joinButton.addActionListener( this );
 		add( Box.createRigidArea( new Dimension( 1, 25 ) ) );
@@ -72,10 +73,19 @@ public class MainForm extends JFrame implements ActionListener
 		{
 			setVisible( false );
 			BannerController controller = new BannerController();
-			new BannerForm( controller );
+			int port = Integer.parseInt( JOptionPane.showInputDialog( "Enter the port number" ) );
+			new BannerForm( controller, new Server( controller, port ) );
 			dispose();
 		}
-		
+		else if ( e.getSource() == joinButton )
+		{
+			setVisible( false );
+			BannerController controller = new BannerController();
+			String input = JOptionPane.showInputDialog( "Enter the server's address and port." );
+			new BannerForm( controller, new Client( controller, input.split( ":" )[0], Integer.parseInt( input.split( ":" )[1] ) ) );
+			dispose();
+		}
+
 	}
 
 	/**

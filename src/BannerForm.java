@@ -26,10 +26,13 @@ public class BannerForm extends JFrame implements KeyListener
 	private Image virtualMem;
 	
 	private BannerController controller;
+	
+	private NetworkDongle dongle;
 
-	public BannerForm( BannerController controller )
+	public BannerForm( BannerController controller, NetworkDongle dongle )
 	{
 		this.controller = controller;
+		this.dongle = dongle;
 		addKeyListener( this );
 		setSize( 600, 600 );
 		setDefaultCloseOperation( DISPOSE_ON_CLOSE );
@@ -61,7 +64,12 @@ public class BannerForm extends JFrame implements KeyListener
 		g.fillRect( 0, 0, getWidth(), getHeight() );
 		g.setFont( new Font( "Sans serif", Font.BOLD, 256 ) );
 		g.setColor( Color.red );
-		g.drawString( "Testing", controller.getLocalBannerX(), 600 );
+		g.drawString( "KECK LAB", controller.getLocalBannerX(), 600 );
+		
+		// Draw the server/clent's status.
+		g.setFont( new Font( "Sans serif", 0, 12 ) );
+		g.setColor( Color.gray );
+		g.drawString( dongle.getStatusString(), 5, getHeight() - 15 );		
 	}
 
 	@Override
@@ -119,7 +127,11 @@ public class BannerForm extends JFrame implements KeyListener
 	public void keyPressed( KeyEvent arg0 )
 	{
 		if ( arg0.getKeyCode() == KeyEvent.VK_ESCAPE )
+		{
+			dongle.disconnect();
+			invalidate();
 			dispose();
+		}
 	}
 
 	@Override
