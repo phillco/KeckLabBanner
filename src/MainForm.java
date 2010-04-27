@@ -77,7 +77,7 @@ public class MainForm extends JFrame implements ActionListener
 			setVisible( false );
 			BannerController controller = new BannerController();
 			int port = 50903;// Integer.parseInt( JOptionPane.showInputDialog( "Enter the port number" ) );
-			new BannerForm( controller, new Server( controller, port ) );
+			new BannerFrame( controller, new Server( controller, port ) );
 			dispose();
 		}
 		else if ( e.getSource() == joinButton )
@@ -85,7 +85,7 @@ public class MainForm extends JFrame implements ActionListener
 			setVisible( false );
 			BannerController controller = new BannerController();
 			String input = "10.40.123.23:50903";//JOptionPane.showInputDialog( "Enter the server's address and port." );
-			new BannerForm( controller, new Client( controller, input.split( ":" )[0], Integer.parseInt( input.split( ":" )[1] ) ) );
+			new BannerFrame( controller, new Client( controller, input.split( ":" )[0], Integer.parseInt( input.split( ":" )[1] ) ) );
 			dispose();
 		}
 

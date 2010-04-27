@@ -15,28 +15,34 @@ import java.awt.event.KeyListener;
 import javax.swing.JFrame;
 
 /**
- * Displays the actual banner using data from <code>BannerController</code>.
+ * The fullscreen window that draws the actual banner (using data from <code>BannerController</code>).
  * @author Phillip Cohen
  */
-public class BannerForm extends JFrame implements KeyListener
+public class BannerFrame extends JFrame implements KeyListener
 {
 	/**
-	 * The <code>Image</code> used for double buffering.
+	 * The virtual <code>Image</code> used for double buffering.
 	 */
-	private Image virtualMem;
+	private Image bufferedImage;
 	
+	/**
+	 * The source of the banner's position.
+	 */
 	private BannerController controller;
 	
+	/**
+	 * Either the client or server.
+	 */
 	private NetworkDongle dongle;
 
-	public BannerForm( BannerController controller, NetworkDongle dongle )
+	public BannerFrame( BannerController controller, NetworkDongle dongle )
 	{
 		this.controller = controller;
 		this.dongle = dongle;
 		addKeyListener( this );
 		setSize( 600, 600 );
 		setDefaultCloseOperation( DISPOSE_ON_CLOSE );
-		updateFullscreen();
+		setFullscreen();
 		setVisible( true );
 	}
 
@@ -66,30 +72,33 @@ public class BannerForm extends JFrame implements KeyListener
 		g.setColor( Color.white);//.darker() );
 		g.drawString( "WE ARE SELF AWARE", controller.getLocalBannerX(), 660 );
 		
-		// Draw the server/clent's status.
+		// Draw the server/clent's status and some debugging data.
 		g.setFont( new Font( "Sans serif", 0, 12 ) );
 		g.setColor( Color.gray );
 		g.drawString( dongle.getStatusString() + " | " + controller.getStatusString(), 5, getHeight() - 15 );		
 	}
 
+	/**
+	 * Paints the form using double buffering.
+	 */
 	@Override
 	public void paint( Graphics g )
 	{
 		// Create the image if needed.
-		if ( virtualMem == null )
-			virtualMem = createImage( getWidth(), getHeight() );
+		if ( bufferedImage == null )
+			bufferedImage = createImage( getWidth(), getHeight() );
 
 		// Draw the game's graphics.
-		draw( virtualMem.getGraphics() );
+		draw( bufferedImage.getGraphics() );
 
 		// Flip the buffer to the screen.
-		g.drawImage( virtualMem, 0, 0, this );
+		g.drawImage( bufferedImage, 0, 0, this );
 
 		repaint();
 	}
 
 	/**
-	 * Included to prevent the clearing of the screen between repaints.
+	 * Don't clear the screen between repaints.
 	 */
 	@Override
 	public void update( Graphics g )
@@ -98,18 +107,17 @@ public class BannerForm extends JFrame implements KeyListener
 	}
 
 	/**
-	 * Sets the window to be the fullscreen window.
+	 * Sets the window to be in fullscreen.
 	 */
-	private void updateFullscreen()
+	private void setFullscreen()
 	{
 		GraphicsDevice graphicsDevice = GraphicsEnvironment.getLocalGraphicsEnvironment().getDefaultScreenDevice();
 
-		// Set fullscreen mode if we're not already.
+		// Set us to be the fullscreen window if we're not already.
 		if ( graphicsDevice.getFullScreenWindow() != this )
 		{
 			dispose();
 			setUndecorated( true );
-			// gameCanvas.setSize( graphicsDevice.getDisplayMode().getWidth(), graphicsDevice.getDisplayMode().getHeight() );
 			setSize( graphicsDevice.getDisplayMode().getWidth(), graphicsDevice.getDisplayMode().getHeight() );
 			pack();
 			graphicsDevice.setFullScreenWindow( this );
@@ -124,9 +132,10 @@ public class BannerForm extends JFrame implements KeyListener
 	}
 
 	@Override
-	public void keyPressed( KeyEvent arg0 )
+	public void keyPressed( KeyEvent key )
 	{
-		if ( arg0.getKeyCode() == KeyEvent.VK_ESCAPE )
+		// Escape disconnects us and quits.
+		if ( key.getKeyCode() == KeyEvent.VK_ESCAPE )
 		{
 			dongle.disconnect();
 			invalidate();
@@ -137,12 +146,10 @@ public class BannerForm extends JFrame implements KeyListener
 	@Override
 	public void keyReleased( KeyEvent arg0 )
 	{
-		// TODO Auto-generated method stub
 	}
 
 	@Override
 	public void keyTyped( KeyEvent arg0 )
 	{
-		// TODO Auto-generated method stub
 	}
 }
