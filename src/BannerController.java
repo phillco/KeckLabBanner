@@ -10,8 +10,7 @@ public class BannerController
 	private boolean shouldRun = true;
 
 	// Global positioning data.
-	public final static int SCREEN_WIDTH = 1440;
-	private int x = -2000, totalWidth, myOffset;
+	private int x = -2800, totalWidth, myOffset;
 
 	public void start()
 	{
@@ -57,7 +56,7 @@ public class BannerController
 
 		// If the banner is off the last computer's screen, wrap it...
 		if ( x > totalWidth )
-			x = -1000;
+			x = -3400;
 	}
 	
 	public int getX()

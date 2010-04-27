@@ -12,6 +12,8 @@ public class Server extends NetworkDongle
 	public final static int DEFAULT_PORT = 51505;
 
 	private int port;
+	
+	private int lastClientIndex = 0;
 
 	private LinkedList<Computer> clients = new LinkedList<Computer>();
 
@@ -71,7 +73,7 @@ public class Server extends NetworkDongle
 			{
 				ClientComputer client = new ClientComputer( serverSocket.accept() ); // Stop here until the client connects.
 				System.out.println( "Server: client received!" );
-				clients.addFirst( client );
+				clients.addLast( client );
 				reflowClients();
 			}
 			catch ( IOException e )
@@ -82,10 +84,13 @@ public class Server extends NetworkDongle
 
 	public void reflowClients()
 	{
-		int globalWidth = clients.size() * BannerController.SCREEN_WIDTH;
+		// Get the global width.
 		int currentLocation = 0;
+		int globalWidth = MainForm.screenWidth;
+		for ( Computer cm : clients )
+			if ( cm instanceof ClientComputer )
+				globalWidth += ( (ClientComputer) cm ).screenWidth;
 
-		
 		// Update all the clients of the location of the banner / size of global area.
 		for ( Computer cm : clients )
 		{
@@ -126,6 +131,8 @@ public class Server extends NetworkDongle
 		public DataInputStream inputStream;
 
 		public int screenWidth;
+		
+		public int numericIndex = ++lastClientIndex;
 
 		public ClientComputer( Socket socket ) throws IOException
 		{
@@ -133,6 +140,7 @@ public class Server extends NetworkDongle
 			outputStream = new DataOutputStream( socket.getOutputStream() );
 			inputStream = new DataInputStream( socket.getInputStream() );
 			screenWidth = inputStream.readInt();
+			outputStream.writeInt( numericIndex );
 		}
 	}
 
@@ -165,7 +173,7 @@ public class Server extends NetworkDongle
 				reflowClients();
 				try
 				{
-					Thread.sleep( 200 );
+					Thread.sleep( 20 );
 				}
 				catch ( InterruptedException e )
 				{

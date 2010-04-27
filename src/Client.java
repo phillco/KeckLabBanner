@@ -1,5 +1,3 @@
-import java.awt.GraphicsDevice;
-import java.awt.GraphicsEnvironment;
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.IOException;
@@ -23,6 +21,8 @@ public class Client extends NetworkDongle
 	private ListenThread listenThread = new ListenThread();
 
 	private BannerController localController;
+
+	private int numericId;
 
 	public Client( BannerController localController, String address, int port )
 	{
@@ -49,10 +49,12 @@ public class Client extends NetworkDongle
 
 		listenThread.start();
 		connected = true;
-		
+
 		try
 		{
 			outputStream.writeInt( MainForm.screenWidth );
+			outputStream.flush();
+			numericId = inputStream.readInt();
 		}
 		catch ( IOException e )
 		{
@@ -116,7 +118,7 @@ public class Client extends NetworkDongle
 	public String getStatusString()
 	{
 		if ( connected )
-			return "Client connected to " + serverAddress + ":" + serverPort + ".";
+			return "Client connected to " + serverAddress + ":" + serverPort + "; we are #" + numericId + ".";
 		else
 			return "Disconnected client";
 	}

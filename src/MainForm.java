@@ -84,7 +84,7 @@ public class MainForm extends JFrame implements ActionListener
 		{
 			setVisible( false );
 			BannerController controller = new BannerController();
-			String input = "10.40.123.89:50900";//JOptionPane.showInputDialog( "Enter the server's address and port." );
+			String input = "10.40.123.84:50900";//JOptionPane.showInputDialog( "Enter the server's address and port." );
 			new BannerForm( controller, new Client( controller, input.split( ":" )[0], Integer.parseInt( input.split( ":" )[1] ) ) );
 			dispose();
 		}
