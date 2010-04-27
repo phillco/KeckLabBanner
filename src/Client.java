@@ -22,8 +22,6 @@ public class Client extends NetworkDongle
 
 	private BannerController localController;
 
-	private int numericId;
-
 	public Client( BannerController localController, String address, int port )
 	{
 		localSocket = null;

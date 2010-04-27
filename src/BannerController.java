@@ -1,45 +1,54 @@
 /**
- * Controls where the banner will be displayed, and where that data comes from (locally, or from the server).
+ * Controls where the banner will be displayed.
  * @author Phillip Cohen
  */
 public class BannerController
 {
-	// Movement.
+	// The thread that moves the banner. 
 	protected UpdaterThread updater = new UpdaterThread();
+	
+	// Speed at which the banner moves.
 	protected final int VELOCITY = 13;
-	private boolean shouldRun = true;
 
-	// Global positioning data.
+	// The starting position at which the banner is invisible.
 	private final int ORIGINAL_POSITION = -3000;
-	private int x = ORIGINAL_POSITION, totalWidth, myOffset;
+	
+	// The current absolute position of the banner.
+	private int x = ORIGINAL_POSITION;
+	
+	// Total width of all the computer screens combined.
+	private int totalWidth;
+	
+	// Offset of the current computer's screen in totalWidth.
+	private int myOffset;
 
+	/**
+	 * Starts the banner's movement. Can only be called once.
+	 */
 	public void start()
 	{
 		updater.start();
 	}
-	
+
+	/**
+	 * Stops the banner and ends the movement thread.
+	 */
 	public void stop()
 	{
-		shouldRun = false;
-	}
-	
-	public String getStatusString()
-	{
-		return "x: " + x + " [ " + myOffset + "/" + totalWidth + " ]";
+		updater.stopRunning();
 	}
 
 	/**
-	 * Updates the size of the global banner (call when a client is added or removed).
+	 * Updates the size of the global area (call when a client is added or removed).
 	 */
 	public void updateOffsetData( int x, int totalWidth, int localOffset )
 	{
 		this.x = x;
-		this.totalWidth = totalWidth;
-		this.myOffset = localOffset;
+		updateOffsetData( totalWidth, localOffset );
 	}
 
 	/**
-	 * Updates the size of the global banner (call when a client is added or removed).
+	 * Updates the size of the global area (call when a client is added or removed).
 	 */
 	public void updateOffsetData( int totalWidth, int localOffset )
 	{
@@ -59,7 +68,10 @@ public class BannerController
 		if ( x > totalWidth )
 			x = ORIGINAL_POSITION;
 	}
-	
+
+	/**
+	 * Returns the GLOBAL banner address for networking.
+	 */
 	public int getX()
 	{
 		return x;
@@ -72,12 +84,27 @@ public class BannerController
 	{
 		return x - myOffset;
 	}
+	
+	/**
+	 * Returns a debugging status string.
+	 */
+	public String getStatusString()
+	{
+		return "x: " + x + " [ " + myOffset + "/" + totalWidth + " ]";
+	}
 
 	/**
 	 * The thread that constantly moves the banner.
 	 */
 	protected class UpdaterThread extends Thread
 	{
+		private boolean shouldRun = true;
+		
+		public void stopRunning()
+		{
+			shouldRun = false;
+		}
+		
 		@Override
 		public void run()
 		{
