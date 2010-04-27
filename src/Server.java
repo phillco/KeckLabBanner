@@ -154,7 +154,7 @@ public class Server extends NetworkDongle
 	}
 
 	@Override
-	public String getStatusString()
+	public String toString()
 	{
 		if ( connected )
 			return "Server at " + getServerIP() + ". " + ( clients.size() > 0 ? clients.size() + " client(s)" : "" );

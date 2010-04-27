@@ -16,6 +16,4 @@ public abstract class NetworkDongle
 		if ( localController != null )
 			localController.stop();
 	}
-
-	public abstract String getStatusString();
 }
