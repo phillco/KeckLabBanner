@@ -20,10 +20,9 @@ public class Client extends NetworkDongle
 
 	private ListenThread listenThread = new ListenThread();
 
-	private BannerController localController;
-
 	public Client( BannerController localController, String address, int port )
 	{
+		super( localController );
 		localSocket = null;
 		this.serverAddress = address;
 		this.serverPort = port;
@@ -59,7 +58,6 @@ public class Client extends NetworkDongle
 			e.printStackTrace();
 		}
 		System.out.println( "Client connected to " + serverAddress + ":" + serverPort + "!" );
-		this.localController = localController;
 		this.localController.start();
 		listenThread.start();
 	}
@@ -108,8 +106,6 @@ public class Client extends NetworkDongle
 			localSocket = null;
 			listenThread.stop();
 		}
-		if ( localController != null )
-			localController.stop();
 	}
 
 	@Override

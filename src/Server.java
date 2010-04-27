@@ -7,50 +7,77 @@ import java.net.Socket;
 import java.net.UnknownHostException;
 import java.util.LinkedList;
 
+import javax.swing.JOptionPane;
+
+/**
+ * The TCP server.
+ * @author Phillip Cohen
+ */
 public class Server extends NetworkDongle
 {
-	public final static int DEFAULT_PORT = 51505;
+	public final static int DEFAULT_PORT = 50900;
 
+	/**
+	 * The port we're running on.
+	 */
 	private int port;
-	
-	private int lastClientIndex = 0;
 
-	private LinkedList<Computer> clients = new LinkedList<Computer>();
+	/**
+	 * All of the clients connected to us.
+	 */
+	private LinkedList<ClientInstance> clients = new LinkedList<ClientInstance>();
 
-	private ServerSocket serverSocket;
+	/**
+	 * The socket with which we listen for connections.
+	 */
+	private ServerSocket listeningSocket;
 
-	private BannerController localController;
-
+	/**
+	 * The thread that listens for new connections.
+	 */
 	private AcceptThread acceptThread = new AcceptThread();
+
+	/**
+	 * The thread that periodically updates clients' about the banner's position.
+	 */
 	private PeriodicReflowThread reflowThread = new PeriodicReflowThread();
 
+	/**
+	 * Starts up the server on the given port.
+	 */
 	public Server( BannerController localController, int port )
 	{
-		this.localController = localController;
-		this.port = port;
+		super( localController );
+
+		// First set up the master instance of the banner (ours!).
 		reflowClients();
 		localController.start();
 
-		// Now actually start the server.
+		// Start listening for connections.
 		try
 		{
-			serverSocket = new ServerSocket( port );
+			this.port = port;
+			listeningSocket = new ServerSocket( port );
 		}
 		catch ( IOException e )
 		{
-			System.out.println( "Could not listen on port: " + port + ".\nAnother server may already be running." );
+			JOptionPane.showMessageDialog( null, "Could not listen on port: " + port + ".\nAnother server may already be running.", "Server error", JOptionPane.ERROR_MESSAGE );
 			return;
 		}
 
-		System.out.println( "Server started at " + getServerIP() + "!" );
+		// We're connected!
 		connected = true;
-		clients.add( new ServerComputer() );
+		System.out.println( "Server started at " + getServerIP() + "!" );
 
-		// Listen for clients.
+		// Start the auxiliary threads.
 		acceptThread.start();
 		reflowThread.start();
 	}
 
+	/**
+	 * Returns this server's IP address and port.
+	 * @return "xxx.xxx.xxx.xxx:port"
+	 */
 	public String getServerIP()
 	{
 		try
@@ -61,20 +88,36 @@ public class Server extends NetworkDongle
 		}
 		catch ( UnknownHostException e )
 		{
-			return "Could not detect IP.";
+			return "Unknown IP:" + port;
 		}
 	}
 
-	public void acceptLoop()
+	/**
+	 * Sends an update to all the clients to update their BannerControllers.
+	 */
+	public void reflowClients()
 	{
-		while ( connected )
+		// Calculate the global width by summing all of the clients' screen widths.
+		int globalWidth = MainForm.screenWidth;
+		for ( ClientInstance client : clients )
+			globalWidth += client.screenWidth;
+
+		// Start with our instance (we're always first on the left).
+		int currentLocation = 0;
+		localController.updateOffsetData( globalWidth, currentLocation );
+		currentLocation += MainForm.screenWidth;
+
+		// Update each of the clients.
+		for ( ClientInstance client : clients )
 		{
 			try
 			{
-				ClientComputer client = new ClientComputer( serverSocket.accept() ); // Stop here until the client connects.
-				System.out.println( "Server: client received!" );
-				clients.addLast( client );
-				reflowClients();
+				client.outputStream.writeByte( 32 );
+				client.outputStream.writeInt( localController.getX() ); // Global location of the banner.
+				client.outputStream.writeInt( globalWidth ); // Global size.
+				client.outputStream.writeInt( currentLocation ); // Their local offset.
+				client.outputStream.flush();
+				currentLocation += client.screenWidth;
 			}
 			catch ( IOException e )
 			{
@@ -82,34 +125,84 @@ public class Server extends NetworkDongle
 		}
 	}
 
-	public void reflowClients()
+	/**
+	 * Shuts down the server.
+	 */
+	@SuppressWarnings( "deprecation" )
+	@Override
+	public void disconnect()
 	{
-		// Get the global width.
-		int currentLocation = 0;
-		int globalWidth = MainForm.screenWidth;
-		for ( Computer cm : clients )
-			if ( cm instanceof ClientComputer )
-				globalWidth += ( (ClientComputer) cm ).screenWidth;
-
-		// Update all the clients of the location of the banner / size of global area.
-		for ( Computer cm : clients )
+		try
 		{
-			if ( cm instanceof ServerComputer )
-			{
-				localController.updateOffsetData( globalWidth, currentLocation );
-				currentLocation += MainForm.screenWidth;
-			}
-			else
+			// Close all of the client sockets.
+			for ( ClientInstance client : clients )
+				client.socket.close();
+
+			// Close the listening socket.
+			if ( listeningSocket != null )
+				listeningSocket.close();
+		}
+		catch ( IOException e )
+		{
+			e.printStackTrace();
+		}
+
+		// Empty our client list, and stop the accept thread (the reflow thread stops automatically).
+		clients.clear();
+		if ( acceptThread != null )
+			acceptThread.stop();
+	}
+
+	@Override
+	public String getStatusString()
+	{
+		if ( connected )
+			return "Server at " + getServerIP() + ". " + ( clients.size() > 0 ? clients.size() + " client(s)" : "" );
+		else
+			return "Disconnected server";
+	}
+
+	/**
+	 * Represents a client connected to us.
+	 */
+	private class ClientInstance
+	{
+		public Socket socket;
+
+		public DataOutputStream outputStream;
+
+		public DataInputStream inputStream;
+
+		public int screenWidth;
+
+		public ClientInstance( Socket socket ) throws IOException
+		{
+			this.socket = socket;
+			outputStream = new DataOutputStream( socket.getOutputStream() );
+			inputStream = new DataInputStream( socket.getInputStream() );
+			screenWidth = inputStream.readInt();
+		}
+	}
+
+	/**
+	 * Listens for new clients, infinitely.
+	 */
+	protected class AcceptThread extends Thread
+	{
+		@Override
+		public void run()
+		{
+			while ( connected )
 			{
 				try
 				{
-					ClientComputer client = (ClientComputer) cm;
-					client.outputStream.writeByte( 32 );
-					client.outputStream.writeInt( localController.getX() );
-					client.outputStream.writeInt( globalWidth );
-					client.outputStream.writeInt( currentLocation );
-					client.outputStream.flush();
-					currentLocation += client.screenWidth;
+					// Wait for a new client.
+					ClientInstance client = new ClientInstance( listeningSocket.accept() ); // Stop here until the client connects.
+
+					// Add it to the list, and update the banner's dimensions.
+					clients.addLast( client );
+					reflowClients();
+					System.out.println( "New client from " + client.socket.getInetAddress() + " connected." );
 				}
 				catch ( IOException e )
 				{
@@ -118,48 +211,8 @@ public class Server extends NetworkDongle
 		}
 	}
 
-	private abstract class Computer
-	{
-	}
-
-	private class ClientComputer extends Computer
-	{
-		public Socket socket;
-
-		public DataOutputStream outputStream;
-
-		public DataInputStream inputStream;
-
-		public int screenWidth;	
-
-		public ClientComputer( Socket socket ) throws IOException
-		{
-			this.socket = socket;
-			outputStream = new DataOutputStream( socket.getOutputStream() );
-			inputStream = new DataInputStream( socket.getInputStream() );
-			screenWidth = inputStream.readInt();
-		//	outputStream.writeInt( numericIndex );
-		}
-	}
-
-	private class ServerComputer extends Computer
-	{
-	}
-
 	/**
-	 * The thread that listens for clients.
-	 */
-	protected class AcceptThread extends Thread
-	{
-		@Override
-		public void run()
-		{
-			acceptLoop();
-		}
-	}
-
-	/**
-	 * The thread that updates clients periodically.
+	 * Periodically updates clients about the banner's location (for consistency).
 	 */
 	protected class PeriodicReflowThread extends Thread
 	{
@@ -169,59 +222,8 @@ public class Server extends NetworkDongle
 			while ( connected )
 			{
 				reflowClients();
-				try
-				{
-					Thread.sleep( 10 );
-				}
-				catch ( InterruptedException e )
-				{
-					// TODO Auto-generated catch block
-					e.printStackTrace();
-				}
+				Util.safeSleep( 10 );
 			}
 		}
-	}
-
-	@Override
-	public void disconnect()
-	{
-		try
-		{
-			for ( Computer c : clients )
-				if ( c instanceof ClientComputer )
-					( (ClientComputer) c ).socket.close();
-
-			clients.clear();
-			if ( serverSocket != null )
-			{
-				serverSocket.close();
-				serverSocket = null;
-			}
-		}
-		catch ( IOException e )
-		{
-			e.printStackTrace();
-		}
-		serverSocket = null;
-		if ( acceptThread != null )
-		{
-			acceptThread.stop();
-			acceptThread = null;
-		}
-		if ( reflowThread != null )
-		{
-			reflowThread.stop();
-			reflowThread = null;
-		}
-		localController.stop();
-	}
-
-	@Override
-	public String getStatusString()
-	{
-		if ( connected )
-			return "Server at " + getServerIP() + ". " + ( clients.size() > 1 ? clients.size() - 1 + " client(s)" : "" );
-		else
-			return "Disconnected server";
 	}
 }
