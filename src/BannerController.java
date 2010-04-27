@@ -4,21 +4,21 @@
  */
 public class BannerController
 {
-	// The thread that moves the banner. 
+	// The thread that moves the banner.
 	protected UpdaterThread updater = new UpdaterThread();
-	
+
 	// Speed at which the banner moves.
 	protected final int VELOCITY = 13;
 
 	// The starting position at which the banner is invisible.
 	private final int ORIGINAL_POSITION = -3000;
-	
+
 	// The current absolute position of the banner.
 	private int x = ORIGINAL_POSITION;
-	
+
 	// Total width of all the computer screens combined.
 	private int totalWidth;
-	
+
 	// Offset of the current computer's screen in totalWidth.
 	private int myOffset;
 
@@ -53,7 +53,7 @@ public class BannerController
 	public void updateOffsetData( int totalWidth, int localOffset )
 	{
 		this.totalWidth = totalWidth;
-		this.myOffset = localOffset;
+		myOffset = localOffset;
 	}
 
 	/**
@@ -84,7 +84,7 @@ public class BannerController
 	{
 		return x - myOffset;
 	}
-	
+
 	/**
 	 * Returns a debugging status string.
 	 */
@@ -99,26 +99,24 @@ public class BannerController
 	protected class UpdaterThread extends Thread
 	{
 		private boolean shouldRun = true;
-		
+
 		public void stopRunning()
 		{
 			shouldRun = false;
 		}
-		
+
 		@Override
 		public void run()
 		{
 			while ( shouldRun )
-			{
 				try
 				{
 					tick();
 					Thread.sleep( 10 );
 				}
-				catch ( InterruptedException e )
+				catch ( final InterruptedException e )
 				{
 				}
-			}
 		}
 	}
 }

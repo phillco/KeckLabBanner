@@ -24,16 +24,16 @@ public class BannerFrame extends JFrame implements KeyListener
 	 * The virtual <code>Image</code> used for double buffering.
 	 */
 	private Image bufferedImage;
-	
+
 	/**
 	 * The source of the banner's position.
 	 */
-	private BannerController controller;
-	
+	private final BannerController controller;
+
 	/**
 	 * Either the client or server.
 	 */
-	private NetworkDongle dongle;
+	private final NetworkDongle dongle;
 
 	public BannerFrame( BannerController controller, NetworkDongle dongle )
 	{
@@ -53,7 +53,7 @@ public class BannerFrame extends JFrame implements KeyListener
 	{
 		// Use fancy, anti-aliased rendering.
 		{
-			Graphics2D g2d = (Graphics2D) g;
+			final Graphics2D g2d = (Graphics2D) g;
 			g2d.setRenderingHint( RenderingHints.KEY_ALPHA_INTERPOLATION, RenderingHints.VALUE_ALPHA_INTERPOLATION_QUALITY );
 			g2d.setRenderingHint( RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON );
 			g2d.setRenderingHint( RenderingHints.KEY_COLOR_RENDERING, RenderingHints.VALUE_COLOR_RENDER_QUALITY );
@@ -69,13 +69,13 @@ public class BannerFrame extends JFrame implements KeyListener
 		g.setColor( Color.black );
 		g.fillRect( 0, 0, getWidth(), getHeight() );
 		g.setFont( new Font( "Sans serif", Font.BOLD, 256 ) );
-		g.setColor( Color.white);//.darker() );
+		g.setColor( Color.white );// .darker() );
 		g.drawString( "WE ARE SELF AWARE", controller.getLocalBannerX(), 660 );
-		
+
 		// Draw the server/clent's status and some debugging data.
 		g.setFont( new Font( "Sans serif", 0, 12 ) );
 		g.setColor( Color.gray );
-		g.drawString( dongle + " | " + controller.getStatusString(), 5, getHeight() - 15 );		
+		g.drawString( dongle + " | " + controller.getStatusString(), 5, getHeight() - 15 );
 	}
 
 	/**
@@ -111,7 +111,7 @@ public class BannerFrame extends JFrame implements KeyListener
 	 */
 	private void setFullscreen()
 	{
-		GraphicsDevice graphicsDevice = GraphicsEnvironment.getLocalGraphicsEnvironment().getDefaultScreenDevice();
+		final GraphicsDevice graphicsDevice = GraphicsEnvironment.getLocalGraphicsEnvironment().getDefaultScreenDevice();
 
 		// Set us to be the fullscreen window if we're not already.
 		if ( graphicsDevice.getFullScreenWindow() != this )
@@ -123,8 +123,8 @@ public class BannerFrame extends JFrame implements KeyListener
 			graphicsDevice.setFullScreenWindow( this );
 
 			// Hide the cursor.
-			Image cursorImage = Toolkit.getDefaultToolkit().getImage( "xparent.gif" );
-			Cursor blankCursor = Toolkit.getDefaultToolkit().createCustomCursor( cursorImage, new Point( 0, 0 ), "" );
+			final Image cursorImage = Toolkit.getDefaultToolkit().getImage( "xparent.gif" );
+			final Cursor blankCursor = Toolkit.getDefaultToolkit().createCustomCursor( cursorImage, new Point( 0, 0 ), "" );
 			setCursor( blankCursor );
 		}
 

@@ -25,7 +25,7 @@ public class Server extends NetworkDongle
 	/**
 	 * All of the clients connected to us.
 	 */
-	private LinkedList<ClientInstance> clients = new LinkedList<ClientInstance>();
+	private final LinkedList<ClientInstance> clients = new LinkedList<ClientInstance>();
 
 	/**
 	 * The socket with which we listen for connections.
@@ -35,12 +35,12 @@ public class Server extends NetworkDongle
 	/**
 	 * The thread that listens for new connections.
 	 */
-	private AcceptThread acceptThread = new AcceptThread();
+	private final AcceptThread acceptThread = new AcceptThread();
 
 	/**
 	 * The thread that periodically updates clients' about the banner's position.
 	 */
-	private PeriodicReflowThread reflowThread = new PeriodicReflowThread();
+	private final PeriodicReflowThread reflowThread = new PeriodicReflowThread();
 
 	/**
 	 * Starts up the server on the given port.
@@ -59,7 +59,7 @@ public class Server extends NetworkDongle
 			this.port = port;
 			listeningSocket = new ServerSocket( port );
 		}
-		catch ( IOException e )
+		catch ( final IOException e )
 		{
 			JOptionPane.showMessageDialog( null, "Could not listen on port: " + port + ".\nAnother server may already be running.", "Server error", JOptionPane.ERROR_MESSAGE );
 			return;
@@ -82,11 +82,11 @@ public class Server extends NetworkDongle
 	{
 		try
 		{
-			InetAddress localHost = InetAddress.getLocalHost();
-			InetAddress[] all_IPs = InetAddress.getAllByName( localHost.getHostName() );
+			final InetAddress localHost = InetAddress.getLocalHost();
+			final InetAddress[] all_IPs = InetAddress.getAllByName( localHost.getHostName() );
 			return ( all_IPs[0].toString().split( "/" ) )[1] + ":" + port;
 		}
-		catch ( UnknownHostException e )
+		catch ( final UnknownHostException e )
 		{
 			return "Unknown IP:" + port;
 		}
@@ -98,18 +98,17 @@ public class Server extends NetworkDongle
 	public void reflowClients()
 	{
 		// Calculate the global width by summing all of the clients' screen widths.
-		int globalWidth = MainForm.screenWidth;
-		for ( ClientInstance client : clients )
+		int globalWidth = Util.getScreenWidth();
+		for ( final ClientInstance client : clients )
 			globalWidth += client.screenWidth;
 
 		// Start with our instance (we're always first on the left).
 		int currentLocation = 0;
 		localController.updateOffsetData( globalWidth, currentLocation );
-		currentLocation += MainForm.screenWidth;
+		currentLocation += Util.getScreenWidth();
 
 		// Update each of the clients.
-		for ( ClientInstance client : clients )
-		{
+		for ( final ClientInstance client : clients )
 			try
 			{
 				client.outputStream.writeByte( 32 );
@@ -119,10 +118,9 @@ public class Server extends NetworkDongle
 				client.outputStream.flush();
 				currentLocation += client.screenWidth;
 			}
-			catch ( IOException e )
+			catch ( final IOException e )
 			{
 			}
-		}
 	}
 
 	/**
@@ -135,14 +133,14 @@ public class Server extends NetworkDongle
 		try
 		{
 			// Close all of the client sockets.
-			for ( ClientInstance client : clients )
+			for ( final ClientInstance client : clients )
 				client.socket.close();
 
 			// Close the listening socket.
 			if ( listeningSocket != null )
 				listeningSocket.close();
 		}
-		catch ( IOException e )
+		catch ( final IOException e )
 		{
 			e.printStackTrace();
 		}
@@ -193,21 +191,19 @@ public class Server extends NetworkDongle
 		public void run()
 		{
 			while ( connected )
-			{
 				try
 				{
 					// Wait for a new client.
-					ClientInstance client = new ClientInstance( listeningSocket.accept() ); // Stop here until the client connects.
+					final ClientInstance client = new ClientInstance( listeningSocket.accept() ); // Stop here until the client connects.
 
 					// Add it to the list, and update the banner's dimensions.
 					clients.addLast( client );
 					reflowClients();
 					System.out.println( "New client from " + client.socket.getInetAddress() + " connected." );
 				}
-				catch ( IOException e )
+				catch ( final IOException e )
 				{
 				}
-			}
 		}
 	}
 

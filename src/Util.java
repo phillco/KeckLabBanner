@@ -1,3 +1,6 @@
+import java.awt.GraphicsDevice;
+import java.awt.GraphicsEnvironment;
+
 /**
  * Contains useful functions.
  */
@@ -12,8 +15,17 @@ public class Util
 		{
 			Thread.sleep( milliSeconds );
 		}
-		catch ( InterruptedException e )
+		catch ( final InterruptedException e )
 		{
 		}
+	}
+
+	/**
+	 * Returns the width of the current screen.
+	 */
+	public static int getScreenWidth()
+	{
+		final GraphicsDevice graphicsDevice = GraphicsEnvironment.getLocalGraphicsEnvironment().getDefaultScreenDevice();
+		return graphicsDevice.getDisplayMode().getWidth();
 	}
 }

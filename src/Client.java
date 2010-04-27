@@ -14,11 +14,11 @@ public class Client extends NetworkDongle
 
 	private Socket localSocket;
 
-	private String serverAddress;
+	private final String serverAddress;
 
-	private int serverPort;
+	private final int serverPort;
 
-	private ReceiveThread receiveThread = new ReceiveThread();
+	private final ReceiveThread receiveThread = new ReceiveThread();
 
 	/**
 	 * Connects the client to given server address.
@@ -26,8 +26,8 @@ public class Client extends NetworkDongle
 	public Client( BannerController localController, String address, int port )
 	{
 		super( localController );
-		this.serverAddress = address;
-		this.serverPort = port;
+		serverAddress = address;
+		serverPort = port;
 
 		// Connect to the server!
 		try
@@ -38,15 +38,15 @@ public class Client extends NetworkDongle
 			outputStream = new DataOutputStream( localSocket.getOutputStream() );
 
 			// Initial handshaking.
-			outputStream.writeInt( MainForm.screenWidth );
+			outputStream.writeInt( Util.getScreenWidth() );
 			outputStream.flush();
 		}
-		catch ( UnknownHostException e )
+		catch ( final UnknownHostException e )
 		{
 			JOptionPane.showMessageDialog( null, "Couldn't look up " + address + ".", "Connection error", JOptionPane.ERROR_MESSAGE );
 			return;
 		}
-		catch ( IOException e )
+		catch ( final IOException e )
 		{
 			JOptionPane.showMessageDialog( null, "Couldn't connect to " + address + ".", "Connection error", JOptionPane.ERROR_MESSAGE );
 			return;
@@ -75,7 +75,7 @@ public class Client extends NetworkDongle
 			if ( localSocket != null )
 				localSocket.close();
 		}
-		catch ( IOException e )
+		catch ( final IOException e )
 		{
 			e.printStackTrace();
 		}
@@ -103,28 +103,26 @@ public class Client extends NetworkDongle
 		public void run()
 		{
 			while ( connected )
-			{
 				try
 				{
-					int i = inputStream.readByte();
+					final int i = inputStream.readByte();
 					if ( i == 32 )
 					{
-						int currentX = inputStream.readInt();
-						int globalWidth = inputStream.readInt();
-						int localOffset = inputStream.readInt();
+						final int currentX = inputStream.readInt();
+						final int globalWidth = inputStream.readInt();
+						final int localOffset = inputStream.readInt();
 						localController.updateOffsetData( currentX, globalWidth, localOffset );
 						System.out.println( "Received reflow: x = " + currentX + ", width = " + globalWidth + ", offset = " + localOffset );
 					}
 					else
 						System.out.println( "RECEIVED: " + i );
 				}
-				catch ( IOException e )
+				catch ( final IOException e )
 				{
 					// Receive error - disconnect.
 					connected = false;
 					System.out.println( "DISCONNECTED :(" );
 				}
-			}
 		}
 	}
 }

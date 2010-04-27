@@ -1,8 +1,6 @@
 import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.Font;
-import java.awt.GraphicsDevice;
-import java.awt.GraphicsEnvironment;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 
@@ -11,7 +9,6 @@ import javax.swing.BoxLayout;
 import javax.swing.JButton;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
-import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 
 /**
@@ -20,18 +17,16 @@ import javax.swing.JPanel;
  */
 public class MainForm extends JFrame implements ActionListener
 {
-	public static int screenWidth;
-
-	private JButton hostButton, joinButton;
+	private final JButton hostButton, joinButton;
 
 	public MainForm()
 	{
 		setLayout( new BoxLayout( getContentPane(), BoxLayout.Y_AXIS ) );
 
 		// Add the title JPanel.
-		JPanel titlePanel = new JPanel();
+		final JPanel titlePanel = new JPanel();
 		{
-			JLabel titleLabel = new JLabel( "Keck Lab Banner!" );
+			final JLabel titleLabel = new JLabel( "Keck Lab Banner!" );
 			titleLabel.setForeground( Color.LIGHT_GRAY );
 			titleLabel.setFont( new Font( "Sans serif", Font.BOLD, 28 ) );
 			titlePanel.add( Box.createRigidArea( new Dimension( 1, 30 ) ) );
@@ -53,9 +48,9 @@ public class MainForm extends JFrame implements ActionListener
 		add( Box.createRigidArea( new Dimension( 1, 35 ) ) );
 
 		// Add the footer.
-		JPanel footerPanel = new JPanel();
+		final JPanel footerPanel = new JPanel();
 		{
-			JLabel footerLabel = new JLabel( "Version 1.0 / created by Phillip Cohen" );
+			final JLabel footerLabel = new JLabel( "Version 1.0 / created by Phillip Cohen" );
 			footerLabel.setForeground( Color.gray );
 			footerPanel.add( footerLabel );
 		}
@@ -75,16 +70,16 @@ public class MainForm extends JFrame implements ActionListener
 		if ( e.getSource() == hostButton )
 		{
 			setVisible( false );
-			BannerController controller = new BannerController();
-			int port = 50903;// Integer.parseInt( JOptionPane.showInputDialog( "Enter the port number" ) );
+			final BannerController controller = new BannerController();
+			final int port = 50903;// Integer.parseInt( JOptionPane.showInputDialog( "Enter the port number" ) );
 			new BannerFrame( controller, new Server( controller, port ) );
 			dispose();
 		}
 		else if ( e.getSource() == joinButton )
 		{
 			setVisible( false );
-			BannerController controller = new BannerController();
-			String input = "10.40.123.23:50903";//JOptionPane.showInputDialog( "Enter the server's address and port." );
+			final BannerController controller = new BannerController();
+			final String input = "10.40.123.23:50903";// JOptionPane.showInputDialog( "Enter the server's address and port." );
 			new BannerFrame( controller, new Client( controller, input.split( ":" )[0], Integer.parseInt( input.split( ":" )[1] ) ) );
 			dispose();
 		}
@@ -97,8 +92,6 @@ public class MainForm extends JFrame implements ActionListener
 	 */
 	public static void main( String[] args )
 	{
-		GraphicsDevice graphicsDevice = GraphicsEnvironment.getLocalGraphicsEnvironment().getDefaultScreenDevice();
-		screenWidth = graphicsDevice.getDisplayMode().getWidth();
 		new MainForm().setVisible( true );
 	}
 }
