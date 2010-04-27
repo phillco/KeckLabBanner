@@ -130,9 +130,7 @@ public class Server extends NetworkDongle
 
 		public DataInputStream inputStream;
 
-		public int screenWidth;
-		
-		public int numericIndex = ++lastClientIndex;
+		public int screenWidth;	
 
 		public ClientComputer( Socket socket ) throws IOException
 		{
@@ -140,7 +138,7 @@ public class Server extends NetworkDongle
 			outputStream = new DataOutputStream( socket.getOutputStream() );
 			inputStream = new DataInputStream( socket.getInputStream() );
 			screenWidth = inputStream.readInt();
-			outputStream.writeInt( numericIndex );
+		//	outputStream.writeInt( numericIndex );
 		}
 	}
 
@@ -173,7 +171,7 @@ public class Server extends NetworkDongle
 				reflowClients();
 				try
 				{
-					Thread.sleep( 20 );
+					Thread.sleep( 10 );
 				}
 				catch ( InterruptedException e )
 				{

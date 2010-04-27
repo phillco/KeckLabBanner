@@ -6,11 +6,12 @@ public class BannerController
 {
 	// Movement.
 	protected UpdaterThread updater = new UpdaterThread();
-	protected final int VELOCITY = 8;
+	protected final int VELOCITY = 13;
 	private boolean shouldRun = true;
 
 	// Global positioning data.
-	private int x = -2800, totalWidth, myOffset;
+	private final int ORIGINAL_POSITION = -3000;
+	private int x = ORIGINAL_POSITION, totalWidth, myOffset;
 
 	public void start()
 	{
@@ -24,7 +25,7 @@ public class BannerController
 	
 	public String getStatusString()
 	{
-		return "x: " + x + " [ " + myOffset + "/" + totalWidth + "]";
+		return "x: " + x + " [ " + myOffset + "/" + totalWidth + " ]";
 	}
 
 	/**
@@ -56,7 +57,7 @@ public class BannerController
 
 		// If the banner is off the last computer's screen, wrap it...
 		if ( x > totalWidth )
-			x = -3400;
+			x = ORIGINAL_POSITION;
 	}
 	
 	public int getX()
@@ -85,7 +86,7 @@ public class BannerController
 				try
 				{
 					tick();
-					Thread.sleep( 15 );
+					Thread.sleep( 10 );
 				}
 				catch ( InterruptedException e )
 				{

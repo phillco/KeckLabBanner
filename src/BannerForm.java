@@ -60,11 +60,11 @@ public class BannerForm extends JFrame implements KeyListener
 		}
 
 		// Draw the background and the text.
-		g.setColor( Color.white );
+		g.setColor( Color.black );
 		g.fillRect( 0, 0, getWidth(), getHeight() );
-		g.setFont( new Font( "Sans serif", Font.BOLD, 512 ) );
-		g.setColor( Color.red.darker() );
-		g.drawString( "KECK LAB", controller.getLocalBannerX(), 600 );
+		g.setFont( new Font( "Sans serif", Font.BOLD, 256 ) );
+		g.setColor( Color.white);//.darker() );
+		g.drawString( "WE ARE SELF AWARE", controller.getLocalBannerX(), 660 );
 		
 		// Draw the server/clent's status.
 		g.setFont( new Font( "Sans serif", 0, 12 ) );

@@ -47,14 +47,13 @@ public class Client extends NetworkDongle
 			return;
 		}
 
-		listenThread.start();
 		connected = true;
 
 		try
 		{
 			outputStream.writeInt( MainForm.screenWidth );
 			outputStream.flush();
-			numericId = inputStream.readInt();
+			// numericId = inputStream.readInt();
 		}
 		catch ( IOException e )
 		{
@@ -64,6 +63,7 @@ public class Client extends NetworkDongle
 		System.out.println( "Client connected to " + serverAddress + ":" + serverPort + "!" );
 		this.localController = localController;
 		this.localController.start();
+		listenThread.start();
 	}
 
 	public void listenLoop()
@@ -118,7 +118,7 @@ public class Client extends NetworkDongle
 	public String getStatusString()
 	{
 		if ( connected )
-			return "Client connected to " + serverAddress + ":" + serverPort + "; we are #" + numericId + ".";
+			return "Client connected to " + serverAddress + ":" + serverPort + ".";
 		else
 			return "Disconnected client";
 	}
