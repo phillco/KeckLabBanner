@@ -11,7 +11,7 @@ public class BannerController
 	protected final int VELOCITY = 13;
 
 	// The starting position at which the banner is invisible.
-	private final int ORIGINAL_POSITION = -3000;
+	private final int ORIGINAL_POSITION = -2500;
 
 	// The current absolute position of the banner.
 	private int x = ORIGINAL_POSITION;

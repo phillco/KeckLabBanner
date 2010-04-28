@@ -70,7 +70,7 @@ public class BannerFrame extends JFrame implements KeyListener
 		g.fillRect( 0, 0, getWidth(), getHeight() );
 		g.setFont( new Font( "Sans serif", Font.BOLD, 256 ) );
 		g.setColor( Color.white );// .darker() );
-		g.drawString( "WE ARE SELF AWARE", controller.getLocalBannerX(), 660 );
+		g.drawString( "HELLO WORLD!", controller.getLocalBannerX(), 660 );
 
 		// Draw the server/clent's status and some debugging data.
 		g.setFont( new Font( "Sans serif", 0, 12 ) );
