@@ -103,10 +103,12 @@ public class Client extends NetworkDongle
 		public void run()
 		{
 			while ( connected )
+			{
 				try
 				{
-					final int i = inputStream.readByte();
-					if ( i == 32 )
+					// Read the type of message.
+					int header = inputStream.readByte();
+					if ( header == Protocol.ServerMessages.REFLOW.networkId )
 					{
 						final int currentX = inputStream.readInt();
 						final int globalWidth = inputStream.readInt();
@@ -115,7 +117,7 @@ public class Client extends NetworkDongle
 						System.out.println( "Received reflow: x = " + currentX + ", width = " + globalWidth + ", offset = " + localOffset );
 					}
 					else
-						System.out.println( "RECEIVED: " + i );
+						System.out.println( "RECEIVED: " + header );
 				}
 				catch ( final IOException e )
 				{
@@ -123,6 +125,7 @@ public class Client extends NetworkDongle
 					connected = false;
 					System.out.println( "DISCONNECTED :(" );
 				}
+			}
 		}
 	}
 }

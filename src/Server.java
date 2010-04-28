@@ -15,8 +15,6 @@ import javax.swing.JOptionPane;
  */
 public class Server extends NetworkDongle
 {
-	public final static int DEFAULT_PORT = 50900;
-
 	/**
 	 * The port we're running on.
 	 */
@@ -111,7 +109,7 @@ public class Server extends NetworkDongle
 		for ( final ClientInstance client : clients )
 			try
 			{
-				client.outputStream.writeByte( 32 );
+				client.outputStream.writeByte( Protocol.ServerMessages.REFLOW.networkId );
 				client.outputStream.writeInt( localController.getX() ); // Global location of the banner.
 				client.outputStream.writeInt( globalWidth ); // Global size.
 				client.outputStream.writeInt( currentLocation ); // Their local offset.

@@ -84,22 +84,40 @@ public class StartupForm extends JFrame implements ActionListener
 		if ( e.getSource() == hostButton )
 		{
 			// Start the server.
-			setVisible( false );
-			BannerController controller = new BannerController();
-			int port = Integer.parseInt( JOptionPane.showInputDialog( "Enter the port to host on." ) );
-			new BannerFrame( controller, new Server( controller, port ) );
-			dispose();
+			try
+			{
+				BannerController controller = new BannerController();
+				int port = Integer.parseInt( JOptionPane.showInputDialog( "Enter the port to host on.", Protocol.DEFAULT_PORT ) );
+				setVisible( false );
+				new BannerFrame( controller, new Server( controller, port ) );
+				dispose();
+			}
+			catch ( NumberFormatException ex )
+			{
+				JOptionPane.showMessageDialog( null, "That's not a number!", "Input error", JOptionPane.ERROR_MESSAGE );
+			}
 		}
 		else if ( e.getSource() == joinButton )
 		{
 			// Start the client.
-			setVisible( false );
 			BannerController controller = new BannerController();
-			String input = JOptionPane.showInputDialog( "Enter the server's address and port." );
-			new BannerFrame( controller, new Client( controller, input.split( ":" )[0], Integer.parseInt( input.split( ":" )[1] ) ) );
-			dispose();
+			String input = JOptionPane.showInputDialog( "Enter the server's address and port (e.g. 127.0.0.1:" + Protocol.DEFAULT_PORT + ")." );
+			try
+			{
+				if ( input.split( ":" ).length == 1 )
+				{
+					int port = Integer.parseInt( input.split( ":" )[1] );
+					new BannerFrame( controller, new Client( controller, input.split( ":" )[0], port ) );
+					dispose();
+				}
+				else
+					JOptionPane.showMessageDialog( null, "Error parsing that IP address.", "Input error", JOptionPane.ERROR_MESSAGE );
+			}
+			catch ( NumberFormatException ex )
+			{
+				JOptionPane.showMessageDialog( null, "Error parsing that port.", "Input error", JOptionPane.ERROR_MESSAGE );
+			}
 		}
-
 	}
 
 	/**
