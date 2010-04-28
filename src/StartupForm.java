@@ -104,6 +104,8 @@ public class StartupForm extends JFrame implements ActionListener
 			String input = JOptionPane.showInputDialog( "Enter the server's address and port (e.g. 127.0.0.1:" + Protocol.DEFAULT_PORT + ")." );
 			try
 			{
+				if ( input == null || input.length() < 1 )
+					return;
 				if ( input.split( ":" ).length == 1 )
 				{
 					int port = Integer.parseInt( input.split( ":" )[1] );
