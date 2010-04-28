@@ -44,11 +44,13 @@ public class Client extends NetworkDongle
 		catch ( final UnknownHostException e )
 		{
 			JOptionPane.showMessageDialog( null, "Couldn't look up " + address + ".", "Connection error", JOptionPane.ERROR_MESSAGE );
+			System.exit( 0 );
 			return;
 		}
 		catch ( final IOException e )
 		{
 			JOptionPane.showMessageDialog( null, "Couldn't connect to " + address + ".", "Connection error", JOptionPane.ERROR_MESSAGE );
+			System.exit( 0 );
 			return;
 		}
 
