@@ -107,6 +107,7 @@ public class Server extends NetworkDongle
 
 		// Update each of the clients.
 		for ( final ClientInstance client : clients )
+		{
 			try
 			{
 				client.outputStream.writeByte( Protocol.ServerMessages.REFLOW.networkId );
@@ -119,6 +120,7 @@ public class Server extends NetworkDongle
 			catch ( final IOException e )
 			{
 			}
+		}
 	}
 
 	/**
