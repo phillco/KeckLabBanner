@@ -106,7 +106,7 @@ public class StartupForm extends JFrame implements ActionListener
 			{
 				if ( input == null || input.length() < 1 )
 					return;
-				if ( input.split( ":" ).length == 1 )
+				if ( input.split( ":" ).length == 2 )
 				{
 					int port = Integer.parseInt( input.split( ":" )[1] );
 					new BannerFrame( controller, new Client( controller, input.split( ":" )[0], port ) );
