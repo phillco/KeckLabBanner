@@ -5,6 +5,7 @@ import java.net.InetAddress;
 import java.net.ServerSocket;
 import java.net.Socket;
 import java.net.UnknownHostException;
+import java.util.Iterator;
 import java.util.LinkedList;
 
 import javax.swing.JOptionPane;
@@ -107,10 +108,14 @@ public class Server extends NetworkDongle
 		currentLocation += Util.getScreenWidth();
 
 		// Update each of the clients.
-		for ( final ClientInstance client : clients )
+		Iterator<ClientInstance> it = clients.iterator();
+		boolean clientsRemoved = false;
+		while ( it.hasNext() )
 		{
 			try
 			{
+				ClientInstance client = it.next();
+
 				client.outputStream.writeByte( Protocol.ServerMessages.REFLOW.networkId );
 				client.outputStream.writeInt( localController.getX() ); // Global location of the banner.
 				client.outputStream.writeInt( globalWidth ); // Global size.
@@ -120,8 +125,13 @@ public class Server extends NetworkDongle
 			}
 			catch ( final IOException e )
 			{
+				it.remove();
+				clientsRemoved = true;
 			}
 		}
+		
+		if ( clientsRemoved )
+			reflowClients();
 	}
 
 	/**
@@ -218,6 +228,16 @@ public class Server extends NetworkDongle
 		{
 			while ( connected )
 			{
+				// Check for disconnected clients.
+				Iterator<ClientInstance> it = clients.iterator();
+				while ( it.hasNext() )
+				{
+					Socket clientSocket = it.next().socket;
+					if ( clientSocket.isClosed() || !clientSocket.isConnected() || clientSocket.isInputShutdown() || clientSocket.isOutputShutdown() )
+						it.remove();
+				}
+
+				// Reflow the clients.
 				reflowClients();
 				Util.safeSleep( 10 );
 			}
