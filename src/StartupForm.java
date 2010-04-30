@@ -3,6 +3,11 @@ import java.awt.Dimension;
 import java.awt.Font;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.IOException;
+import java.util.Properties;
 
 import javax.swing.Box;
 import javax.swing.BoxLayout;
@@ -20,6 +25,10 @@ public class StartupForm extends JFrame implements ActionListener
 {
 	// The buttons that start a session.
 	private final JButton hostButton, joinButton;
+
+	private static final String SETTINGS_FILE_PATH = "QuickStart.props";
+
+	private static Properties QuickStartSettings = new Properties();
 
 	public StartupForm()
 	{
@@ -85,10 +94,17 @@ public class StartupForm extends JFrame implements ActionListener
 		{
 			// Start the server.
 			try
-			{
+			{					
+				// Read the server's port.
+				String input;
+				if ( QuickStartSettings.containsKey( "serverPort" ) )
+					input = QuickStartSettings.getProperty( "serverPort" );
+				else
+					input = JOptionPane.showInputDialog( "Enter the port to host on.", Protocol.DEFAULT_PORT );
+				int port = Integer.parseInt( input );
+				
+				// Create the main frame, server, and controller.
 				BannerController controller = new BannerController();
-				int port = Integer.parseInt( JOptionPane.showInputDialog( "Enter the port to host on.", Protocol.DEFAULT_PORT ) );
-				setVisible( false );
 				new BannerFrame( controller, new Server( controller, port ) );
 				dispose();
 			}
@@ -100,15 +116,22 @@ public class StartupForm extends JFrame implements ActionListener
 		else if ( e.getSource() == joinButton )
 		{
 			// Start the client.
-			BannerController controller = new BannerController();
-			String input = JOptionPane.showInputDialog( "Enter the server's address and port (e.g. 127.0.0.1:" + Protocol.DEFAULT_PORT + ")." );
+			
+			// Read the connection address.
+			String input;
+			if ( QuickStartSettings.containsKey( "connectIP" ) )
+				input = QuickStartSettings.getProperty( "connectIP" );
+			else
+				input = JOptionPane.showInputDialog( "Enter the server's address and port (e.g. 127.0.0.1:" + Protocol.DEFAULT_PORT + ")." );
 			try
 			{
 				if ( input == null || input.length() < 1 )
 					return;
 				if ( input.split( ":" ).length == 2 )
 				{
+					// Create the main frame, server, and controller.
 					int port = Integer.parseInt( input.split( ":" )[1] );
+					BannerController controller = new BannerController();
 					new BannerFrame( controller, new Client( controller, input.split( ":" )[0], port ) );
 					dispose();
 				}
@@ -128,6 +151,16 @@ public class StartupForm extends JFrame implements ActionListener
 	 */
 	public static void main( String[] args )
 	{
+		try
+		{
+			QuickStartSettings.load( new FileInputStream( SETTINGS_FILE_PATH ) );
+		}
+		catch ( FileNotFoundException e )
+		{
+		}
+		catch ( IOException e )
+		{
+		}
 		new StartupForm().setVisible( true );
 	}
 }
